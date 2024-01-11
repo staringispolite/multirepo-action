@@ -40,6 +40,7 @@ try {
     const subdirectory = core.getInput('subdirectory');
     const force = core.getBooleanInput('force');
     process.chdir(subdirectory);
+    await execOrThrow('git', ['fetch', '-u', 'origin', `${targetBranch}:${targetBranch}`]);
     await execOrThrow('git', ['symbolic-ref', 'HEAD', `refs/heads/${targetBranch}`]);
     const mainConfig = JSON.parse(await readFile('mint.json', 'utf-8'));
     resetToken = await setToken(token);
