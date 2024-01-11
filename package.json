@@ -19,6 +19,7 @@
     "yaml": "^2.3.4"
   },
   "devDependencies": {
+    "@mintlify/models": "^0.0.63",
     "@types/node": "^20.10.8",
     "typescript": "^5.3.3"
   }

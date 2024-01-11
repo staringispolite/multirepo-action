@@ -3,6 +3,8 @@ import * as exec from '@actions/exec';
 import * as io from '@actions/io';
 import { writeFile, readFile } from 'fs/promises';
 import { parse } from 'yaml';
+import type { MintConfig, Navigation, NavigationEntry } from '@mintlify/models';
+import path from 'path';
 
 type Repo = {
   owner: string;
@@ -30,6 +32,21 @@ const setToken = async (token: string) => {
   return () => execOrThrow('git', ['config', '--local', '--unset-all', headerKey]);
 }
 
+const prependPrefix = (nav: NavigationEntry[], prefix: string): NavigationEntry[] => {
+  return nav.map((entry) => (
+    typeof entry === 'string'
+      ? `${prefix}/${entry}`
+      : {
+          ...entry,
+          pages: prependPrefix(entry.pages, prefix)
+        }
+  ))
+};
+
+const mergeNavigation = (main: Navigation, sub: Navigation, prefix: string) => {
+  return [...main, ...prependPrefix(sub, prefix)];
+}
+
 let resetToken;
 try {
   const token = core.getInput('token');
@@ -38,6 +55,9 @@ try {
   const subdirectory = core.getInput('subdirectory');
 
   process.chdir(subdirectory);
+
+  const mainConfig = JSON.parse(await readFile('mint.json', 'utf-8')) as MintConfig;
+
   resetToken = await setToken(token);
   for (const { owner, repo, ref } of repos) {
     await io.rmRF(repo);
@@ -46,9 +66,13 @@ try {
     if (ref) args.push('--branch', ref);
     args.push(`https://github.com/${owner}/${repo}`);
 
+    const subConfig = JSON.parse(await readFile(path.join(repo, 'mint.json'), 'utf-8')) as MintConfig;
+    mergeNavigation(mainConfig.navigation, subConfig.navigation, repo);
     await execOrThrow('git', args);
     await io.rmRF(`${repo}/.git`);
   }
+
+  await writeFile('mint.json', JSON.stringify(mainConfig, null, 2));
 
   await execOrThrow('git', ['add', '.']);
   try {
