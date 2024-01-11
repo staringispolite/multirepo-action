@@ -66,10 +66,11 @@ try {
     if (ref) args.push('--branch', ref);
     args.push(`https://github.com/${owner}/${repo}`);
 
-    const subConfig = JSON.parse(await readFile(path.join(repo, 'mint.json'), 'utf-8')) as MintConfig;
-    mergeNavigation(mainConfig.navigation, subConfig.navigation, repo);
     await execOrThrow('git', args);
     await io.rmRF(`${repo}/.git`);
+
+    const subConfig = JSON.parse(await readFile(path.join(repo, 'mint.json'), 'utf-8')) as MintConfig;
+    mergeNavigation(mainConfig.navigation, subConfig.navigation, repo);
   }
 
   await writeFile('mint.json', JSON.stringify(mainConfig, null, 2));
