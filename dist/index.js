@@ -21,16 +21,16 @@ const setToken = async (token) => {
     await writeFile(configPath, configString.replace(headerPlaceholder, headerValue));
     return () => execOrThrow('git', ['config', '--local', '--unset-all', headerKey]);
 };
-const prependPrefix = (nav, prefix) => {
-    return nav.map((entry) => (typeof entry === 'string'
-        ? `${prefix}/${entry}`
-        : {
-            ...entry,
-            pages: prependPrefix(entry.pages, prefix)
-        }));
+const prependPrefix = (group, prefix) => {
+    return {
+        ...group,
+        pages: group.pages.map((entry) => (typeof entry === 'string'
+            ? `${prefix}/${entry}`
+            : prependPrefix(entry, prefix))),
+    };
 };
 const mergeNavigation = (main, sub, prefix) => {
-    return [...main, ...prependPrefix(sub, prefix)];
+    return [...main, ...sub.map((group) => prependPrefix(group, prefix))];
 };
 let resetToken;
 try {
@@ -53,7 +53,7 @@ try {
         await execOrThrow('git', args);
         await io.rmRF(`${repo}/.git`);
         const subConfig = JSON.parse(await readFile(path.join(repo, 'mint.json'), 'utf-8'));
-        mergeNavigation(mainConfig.navigation, subConfig.navigation, repo);
+        mainConfig.navigation = mergeNavigation(mainConfig.navigation, subConfig.navigation, repo);
     }
     await writeFile('mint.json', JSON.stringify(mainConfig, null, 2));
     await execOrThrow('git', ['add', '.']);

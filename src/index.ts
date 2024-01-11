@@ -3,7 +3,7 @@ import * as exec from '@actions/exec';
 import * as io from '@actions/io';
 import { writeFile, readFile } from 'fs/promises';
 import { parse } from 'yaml';
-import type { MintConfig, Navigation, NavigationEntry } from '@mintlify/models';
+import type { MintConfig, Navigation, NavigationGroup } from '@mintlify/models';
 import path from 'path';
 
 type Repo = {
@@ -32,19 +32,19 @@ const setToken = async (token: string) => {
   return () => execOrThrow('git', ['config', '--local', '--unset-all', headerKey]);
 }
 
-const prependPrefix = (nav: NavigationEntry[], prefix: string): NavigationEntry[] => {
-  return nav.map((entry) => (
-    typeof entry === 'string'
-      ? `${prefix}/${entry}`
-      : {
-          ...entry,
-          pages: prependPrefix(entry.pages, prefix)
-        }
-  ))
+const prependPrefix = (group: NavigationGroup, prefix: string): NavigationGroup => {
+  return {
+    ...group,
+    pages: group.pages.map((entry) => (
+      typeof entry === 'string'
+        ? `${prefix}/${entry}`
+        : prependPrefix(entry, prefix)
+    )),
+  };
 };
 
 const mergeNavigation = (main: Navigation, sub: Navigation, prefix: string) => {
-  return [...main, ...prependPrefix(sub, prefix)];
+  return [...main, ...sub.map((group) => prependPrefix(group, prefix))];
 }
 
 let resetToken;
@@ -74,7 +74,7 @@ try {
     await io.rmRF(`${repo}/.git`);
 
     const subConfig = JSON.parse(await readFile(path.join(repo, 'mint.json'), 'utf-8')) as MintConfig;
-    mergeNavigation(mainConfig.navigation, subConfig.navigation, repo);
+    mainConfig.navigation = mergeNavigation(mainConfig.navigation, subConfig.navigation, repo);
   }
 
   await writeFile('mint.json', JSON.stringify(mainConfig, null, 2));
