@@ -38,6 +38,7 @@ try {
     const repos = parse(core.getInput('repos'));
     const targetBranch = core.getInput('target-branch');
     const subdirectory = core.getInput('subdirectory');
+    const force = core.getBooleanInput('force');
     process.chdir(subdirectory);
     const mainConfig = JSON.parse(await readFile('mint.json', 'utf-8'));
     resetToken = await setToken(token);
@@ -62,7 +63,11 @@ try {
         await execOrThrow('git', ['config', 'user.name', 'Mintie Bot']);
         await execOrThrow('git', ['config', 'user.email', 'aws@mintlify.com']);
         await execOrThrow('git', ['commit', '-m', 'update']);
-        await execOrThrow('git', ['push', 'origin', `HEAD:${targetBranch}`]);
+        const pushArgs = ['push'];
+        if (force)
+            pushArgs.push('--force');
+        pushArgs.push('origin', `HEAD:${targetBranch}`);
+        await execOrThrow('git', pushArgs);
     }
 }
 catch (error) {

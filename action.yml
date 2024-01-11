@@ -17,6 +17,10 @@ inputs:
     description: Path to the directory containing the main mint.json
     required: false
     default: '.'
+  force:
+    description: If `true`, will force-push to `target-branch`
+    required: false
+    default: false
 runs:
   using: node20
   main: dist/index.js

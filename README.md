@@ -19,6 +19,9 @@ The branch to which the complete documentation will be pushed
 
 Path to the directory containing the main `mint.json`
 
+### force
+
+If `true`, will force-push to `target-branch`
 
 ## Example
 
