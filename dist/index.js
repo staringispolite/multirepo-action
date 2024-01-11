@@ -38,11 +38,11 @@ try {
         await io.rmRF(`${repo}/.git`);
     }
     await execOrThrow('git', ['add', '.']);
-    const hasChanges = await exec.exec('git', ['diff-index', '--quiet', '--cached', 'HEAD', '--']) !== 0;
-    if (!hasChanges) {
+    try {
+        await exec.exec('git', ['diff-index', '--quiet', '--cached', 'HEAD', '--']) !== 0;
         console.log('No changes detected, skipping...');
     }
-    else {
+    catch {
         await execOrThrow('git', ['commit', '-m', 'update']);
         await execOrThrow('git', ['push', 'origin', `HEAD:${targetBranch}`]);
     }
