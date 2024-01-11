@@ -1,0 +1,14 @@
+name: 'Mintlify Multirepo Action'
+description: 'Combine multiple Mintlify docs repositories'
+inputs:
+  subdirectory:
+    description: 'Path to the directory containing the main mint.json'
+    required: false
+    default: '.'
+  target-branch:
+    description: 'The branch to which the complete documentation will be pushed'
+    required: false
+    default: 'main'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
