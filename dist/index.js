@@ -40,6 +40,7 @@ try {
     const subdirectory = core.getInput('subdirectory');
     const force = core.getBooleanInput('force');
     process.chdir(subdirectory);
+    await execOrThrow('git', ['symbolic-ref', 'HEAD', `refs/heads/${targetBranch}`]);
     const mainConfig = JSON.parse(await readFile('mint.json', 'utf-8'));
     resetToken = await setToken(token);
     for (const { owner, repo, ref } of repos) {
@@ -66,7 +67,7 @@ try {
         const pushArgs = ['push'];
         if (force)
             pushArgs.push('--force');
-        pushArgs.push('origin', `HEAD:${targetBranch}`);
+        pushArgs.push('origin', targetBranch);
         await execOrThrow('git', pushArgs);
     }
 }

@@ -57,6 +57,8 @@ try {
 
   process.chdir(subdirectory);
 
+  await execOrThrow('git', ['symbolic-ref', 'HEAD', `refs/heads/${targetBranch}`]);
+
   const mainConfig = JSON.parse(await readFile('mint.json', 'utf-8')) as MintConfig;
 
   resetToken = await setToken(token);
@@ -87,7 +89,7 @@ try {
 
     const pushArgs = ['push'];
     if (force) pushArgs.push('--force');
-    pushArgs.push('origin', `HEAD:${targetBranch}`);
+    pushArgs.push('origin', targetBranch);
     await execOrThrow('git', pushArgs);
   }
 } catch (error) {
