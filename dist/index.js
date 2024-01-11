@@ -43,6 +43,8 @@ try {
         console.log('No changes detected, skipping...');
     }
     catch {
+        await execOrThrow('git', ['config', 'user.name', 'Mintie Bot']);
+        await execOrThrow('git', ['config', 'user.email', 'aws@mintlify.com']);
         await execOrThrow('git', ['commit', '-m', 'update']);
         await execOrThrow('git', ['push', 'origin', `HEAD:${targetBranch}`]);
     }
