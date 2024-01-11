@@ -1,5 +1,6 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
+import * as io from '@actions/io';
 import { writeFile, readFile } from 'fs/promises';
 import { parse } from 'yaml';
 const execOrThrow = async (...args) => {
@@ -25,15 +26,16 @@ try {
     const repos = parse(core.getInput('repos'));
     const targetBranch = core.getInput('target-branch');
     const subdirectory = core.getInput('subdirectory');
-    await execOrThrow('cd', [subdirectory]);
+    process.chdir(subdirectory);
     resetToken = await setToken(token);
     for (const { owner, repo, ref } of repos) {
-        await execOrThrow('rm', ['-rf', repo]);
+        await io.rmRF(repo);
         const args = ['clone', '--depth=1'];
         if (ref)
             args.push(`--branch="${ref}"`);
         args.push(`https://github.com/${owner}/${repo}`);
         await execOrThrow('git', args);
+        await io.rmRF(`${repo}/.git`);
     }
     await execOrThrow('git', ['add', '.']);
     const hasChanges = await exec.exec('git', ['diff-index', '--quiet', '--cached', 'HEAD', '--']) !== 0;
