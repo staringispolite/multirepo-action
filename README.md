@@ -36,7 +36,7 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v3
       - name: Run mintlify action
-        uses: mintlify/mintlify-multirepo-action@v0.1
+        uses: mintlify/mintlify-multirepo-action@v0.9
         with:
           repos: |
             - owner: mintlify
