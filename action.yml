@@ -1,14 +1,22 @@
-name: 'Mintlify Multirepo Action'
-description: 'Combine multiple Mintlify docs repositories'
+name: Mintlify Multirepo Action
+description: Combine multiple Mintlify docs repositories
 inputs:
+  repos:
+    description: >
+      A stringified yaml array containing objects representing the
+      mintlify docs repositories to be aggregated.
+    required: true
+  token:
+    description: A GitHub auth token used to push the results to GitHub
+    required: true
   target-branch:
-    description: 'The branch to which the complete documentation will be pushed'
+    description: The branch to which the complete documentation will be pushed
     required: false
-    default: 'main'
+    default: main
   subdirectory:
-    description: 'Path to the directory containing the main mint.json'
+    description: Path to the directory containing the main mint.json
     required: false
     default: '.'
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: node20
+  main: dist/index.js
