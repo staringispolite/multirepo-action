@@ -1,6 +1,7 @@
 {
   "name": "mintlify-multirepo-action",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,10 +14,10 @@
   "license": "ISC",
   "dependencies": {
     "@actions/core": "^1.10.1",
-    "@actions/github": "^6.0.0"
+    "@actions/exec": "^1.1.1",
+    "yaml": "^2.3.4"
   },
   "devDependencies": {
-    "@mintlify/models": "^0.0.63",
     "@types/node": "^20.10.8",
     "typescript": "^5.3.3"
   }
