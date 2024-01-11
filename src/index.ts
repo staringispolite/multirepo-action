@@ -43,7 +43,7 @@ try {
     await io.rmRF(repo);
 
     const args = ['clone', '--depth=1'];
-    if (ref) args.push(`--branch="${ref}"`);
+    if (ref) args.push('--branch', ref);
     args.push(`https://github.com/${owner}/${repo}`);
 
     await execOrThrow('git', args);
