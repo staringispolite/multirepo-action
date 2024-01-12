@@ -68,7 +68,7 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v4
       - name: Run mintlify action
-        uses: mintlify/mintlify-multirepo-action@v0.13
+        uses: mintlify/mintlify-multirepo-action@v0.14
         with:
           token: ${{ secrets.PUSH_TOKEN }}
           target-branch: docs

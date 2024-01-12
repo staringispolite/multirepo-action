@@ -34,7 +34,6 @@ const mergeNavigation = (main, sub, prefix) => {
 };
 const checkoutBranch = async (branch) => {
     try {
-        await execOrThrow('git', ['ls-remote', '--heads', '--exit-code', 'origin', branch]);
         await execOrThrow('git', ['fetch', '-u', 'origin', `${branch}:${branch}`]);
         await execOrThrow('git', ['symbolic-ref', 'HEAD', `refs/heads/${branch}`]);
     }
