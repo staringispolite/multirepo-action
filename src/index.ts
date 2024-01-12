@@ -47,6 +47,16 @@ const mergeNavigation = (main: Navigation, sub: Navigation, prefix: string) => {
   return [...main, ...sub.map((group) => prependPrefix(group, prefix))];
 }
 
+const checkoutBranch = async (branch: string) => {
+  try {
+    await execOrThrow('git', ['ls-remote', '--heads', '--exit-code', 'origin', branch]);
+    await execOrThrow('git', ['fetch', '-u', 'origin', `${branch}:${branch}`]);
+    await execOrThrow('git', ['symbolic-ref', 'HEAD', `refs/heads/${branch}`]);
+  } catch {
+    await execOrThrow('git', ['checkout', '-b', branch]);
+  }
+}
+
 let resetToken;
 try {
   const token = core.getInput('token');
@@ -57,8 +67,7 @@ try {
 
   process.chdir(subdirectory);
 
-  await execOrThrow('git', ['fetch', '-u', 'origin', `${targetBranch}:${targetBranch}`])
-  await execOrThrow('git', ['symbolic-ref', 'HEAD', `refs/heads/${targetBranch}`]);
+  checkoutBranch(targetBranch);
 
   const mainConfig = JSON.parse(await readFile('mint.json', 'utf-8')) as MintConfig;
 
