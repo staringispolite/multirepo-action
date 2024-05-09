@@ -29,9 +29,10 @@ the target branch
 A stringified yaml array containing objects representing the
 mintlify docs repositories to be aggregated. These objects
 have the following properties:
-- `owner`: **(required)** the owner/org of the repo
-- `repo`: **(required)** the name of the repo
-- `ref`: the branch/ref at which to check out the repository
+- `owner`: **(required)** the owner/org of the subrepo
+- `repo`: **(required)** the name of the subrepo
+- `ref`: the branch/ref at which to check out the subrepo
+- `subdirectory`: path to the directory containing the subrepo's `mint.json`
 
 ### target-branch (required)
 

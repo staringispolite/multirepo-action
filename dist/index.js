@@ -53,14 +53,22 @@ try {
     await checkoutBranch(targetBranch);
     const mainConfig = JSON.parse(await readFile('mint.json', 'utf-8'));
     resetToken = await setToken(token);
-    for (const { owner, repo, ref } of repos) {
+    for (const { owner, repo, ref, subdirectory: subrepoSubdirectory } of repos) {
         await io.rmRF(repo);
         const args = ['clone', '--depth=1'];
         if (ref)
             args.push('--branch', ref);
         args.push(`https://github.com/${owner}/${repo}`);
         await execOrThrow('git', args);
-        await io.rmRF(`${repo}/.git`);
+        if (subrepoSubdirectory) {
+            const tempDirName = 'temporary-docs-dir';
+            await io.mv(path.join(repo, subrepoSubdirectory), tempDirName);
+            await io.rmRF(repo);
+            await io.mv(tempDirName, repo);
+        }
+        else {
+            await io.rmRF(`${repo}/.git`);
+        }
         const subConfig = JSON.parse(await readFile(path.join(repo, 'mint.json'), 'utf-8'));
         mainConfig.navigation = mergeNavigation(mainConfig.navigation, subConfig.navigation, repo);
     }
