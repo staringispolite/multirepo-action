@@ -45,7 +45,25 @@ const prependPrefix = (group: NavigationGroup, prefix: string): NavigationGroup 
 };
 
 const mergeNavigation = (main: Navigation, sub: Navigation, prefix: string) => {
-  return [...main, ...sub.map((group) => prependPrefix(group, prefix))];
+  sub.forEach(subGroup => {
+    // Update pages accordingly, to nest under their subRepo's folder
+    const prefixedGroup = prependPrefix(subGroup, prefix);
+
+    let existingGroupIndex = main.findIndex(mainGroup => mainGroup.group === subGroup.group);
+    if (existingGroupIndex != -1) {
+      // Overwrite groups of the same name, so that we don't add duplicates every
+      // time the code runs, and they maintain the order they were arleady in.
+      // This assumes navigation group names are unique. This appears to be how it's used,
+      // but it wasn't enforced before now. 
+      // However, this could be done based on a new key in navigation objects, say, `unique_id`.
+      // Current behavior would be unchanged unless people opt-in by using `unique_id`.
+      main[existingGroupIndex] = prefixedGroup;
+    } else {
+      // If there are no existing groups by this name, append it for the first time.
+      main.push(prefixedGroup);
+    }
+  });
+  return main;
 }
 
 const checkoutBranch = async (branch: string) => {
